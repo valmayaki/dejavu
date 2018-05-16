@@ -1,6 +1,12 @@
 from __future__ import absolute_import
-from itertools import izip_longest
-import Queue
+try:
+    # Python 3
+    from itertools import zip_longest
+except ImportError:
+    # Python 2
+    from itertools import izip_longest as zip_longest
+
+import queue
 
 import MySQLdb as mysql
 from MySQLdb.cursors import DictCursor
@@ -293,9 +299,10 @@ class SQLDatabase(Database):
             for split_values in grouper(values, 1000):
                 # Create our IN part of the query
                 query = self.SELECT_MULTIPLE
-                query = query % ', '.join(['UNHEX(%s)'] * len(split_values))
+                split_values_list = list(split_values)
+                query = query % ', '.join(['UNHEX(%s)'] * len(split_values_list))
 
-                cur.execute(query, split_values)
+                cur.execute(query, split_values_list)
 
                 for hash, sid, offset in cur:
                     # (sid, db_offset - song_sampled_offset)
@@ -312,7 +319,7 @@ class SQLDatabase(Database):
 def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return (filter(None, values) for values
-            in izip_longest(fillvalue=fillvalue, *args))
+            in zip_longest(fillvalue=fillvalue, *args))
 
 
 def cursor_factory(**factory_options):
@@ -333,14 +340,14 @@ class Cursor(object):
         cur.execute(query)
     ```
     """
-    _cache = Queue.Queue(maxsize=5)
+    _cache = queue.Queue(maxsize=5)
 
     def __init__(self, cursor_type=mysql.cursors.Cursor, **options):
         super(Cursor, self).__init__()
 
         try:
             conn = self._cache.get_nowait()
-        except Queue.Empty:
+        except queue.Empty:
             conn = mysql.connect(**options)
         else:
             # Ping the connection before using it from the cache.
@@ -352,7 +359,7 @@ class Cursor(object):
 
     @classmethod
     def clear_cache(cls):
-        cls._cache = Queue.Queue(maxsize=5)
+        cls._cache = queue.Queue(maxsize=5)
 
     def __enter__(self):
         self.cursor = self.conn.cursor(self.cursor_type)
@@ -369,5 +376,5 @@ class Cursor(object):
         # Put it back on the queue
         try:
             self._cache.put_nowait(self.conn)
-        except Queue.Full:
+        except queue.Full:
             self.conn.close()

@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+try:
+    import dejavu
+except:
+    import sys
+    sys.path.append("../../dejavu")
+    import dejavu
+
 import os
 import sys
 import json
