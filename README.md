@@ -1,6 +1,12 @@
 dejavu
 ==========
 
+## First things First
+
+Thanks to the work by worldveil/dejavu, this one differ from previous one is that this make some changes to support python3. 
+
+## Original Starts from Here
+
 Audio fingerprinting and recognition algorithm implemented in Python, see the explanation here:  
 [How it works](http://willdrevo.com/fingerprinting-and-audio-recognition-with-python/)
 
