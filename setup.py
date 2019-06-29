@@ -1,5 +1,5 @@
 from setuptools import setup
-# import os, sys
+import os, sys
 
 
 def is_package(path):
