@@ -1,32 +1,6 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 # import os, sys
 
-
-def is_package(path):
-    return (
-        os.path.isdir(path) and
-        os.path.isfile(os.path.join(path, '__init__.py'))
-    )
-
-
-def find_packages(path, base=''):
-    """Find all packages in path """
-    packages = {}
-    for item in os.listdir(path):
-        dir = os.path.join(path, item)
-        if is_package(dir):
-            if base:
-                module_name = base + '.' + item
-            else:
-                module_name = item
-            packages[module_name] = dir
-            packages.update(find_packages(dir, module_name))
-    return packages
-
-
-def readme():
-    with open('README.md') as f:
-        return f.read()
 
 def parse_requirements(requirements):
     # load from requirements.txt
@@ -71,7 +45,7 @@ setup(
     url='http://github.com/tuxdna/dejavu',
     license='MIT License',
     include_package_data=True,
-    packages=find_packages("."),
+    packages=find_packages(),
     platforms=['Unix'],
     install_requires=REQUIREMENTS,
     classifiers=[
